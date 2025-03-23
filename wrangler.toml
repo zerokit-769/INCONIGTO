@@ -1,0 +1,40 @@
+name = "inconigto-mode"
+main = "_worker.js"
+compatibility_date = "2023-05-26"
+# node_compat = true
+workers_dev = true
+routes = [
+  { pattern = "inconigto.web.id", custom_domain = true },
+  { pattern = "ava.game.naver.com.inconigto.web.id", custom_domain = true },
+  { pattern = "df.game.naver.com.inconigto.web.id", custom_domain = true },
+  { pattern = "graph.instagram.com.inconigto.web.id", custom_domain = true },
+  { pattern = "zaintest.vuclip.com.inconigto.web.id", custom_domain = true },
+  { pattern = "support.zoom.us.inconigto.web.id", custom_domain = true },  
+  { pattern = "cache.netflix.com.inconigto.web.id", custom_domain = true },
+
+  { pattern = "inconigto.biz.id", custom_domain = true },
+  { pattern = "ava.game.naver.com.inconigto.biz.id", custom_domain = true },
+  { pattern = "df.game.naver.com.inconigto.biz.id", custom_domain = true },
+  { pattern = "graph.instagram.com.inconigto.biz.id", custom_domain = true },
+  { pattern = "zaintest.vuclip.com.inconigto.biz.id", custom_domain = true },
+  { pattern = "support.zoom.us.inconigto.biz.id", custom_domain = true },  
+  { pattern = "cache.netflix.com.inconigto.biz.id", custom_domain = true },
+
+  { pattern = "inconigtovpn.web.id", custom_domain = true },
+  { pattern = "ava.game.naver.com.inconigtovpn.web.id", custom_domain = true },
+  { pattern = "df.game.naver.com.inconigtovpn.web.id", custom_domain = true },
+  { pattern = "graph.instagram.com.inconigtovpn.web.id", custom_domain = true },
+  { pattern = "zaintest.vuclip.com.inconigtovpn.web.id", custom_domain = true },
+  { pattern = "support.zoom.us.inconigtovpn.web.id", custom_domain = true },  
+  { pattern = "cache.netflix.com.inconigtovpn.web.id", custom_domain = true },
+
+  { pattern = "inconigtovpn.biz.id", custom_domain = true },
+  { pattern = "ava.game.naver.com.inconigtovpn.biz.id", custom_domain = true },
+  { pattern = "df.game.naver.com.inconigtovpn.biz.id", custom_domain = true },
+  { pattern = "graph.instagram.com.inconigtovpn.biz.id", custom_domain = true },
+  { pattern = "zaintest.vuclip.com.inconigtovpn.biz.id", custom_domain = true },
+  { pattern = "support.zoom.us.inconigtovpn.biz.id", custom_domain = true },  
+  { pattern = "cache.netflix.com.inconigtovpn.biz.id", custom_domain = true }
+]
+
+[vars]
