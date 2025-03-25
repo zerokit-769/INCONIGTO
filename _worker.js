@@ -94,13 +94,13 @@ export default {
           let selectedProxy =
             index === null ? proxyState.get(countryCode) || filteredProxies[0] : filteredProxies[index];
 
-          proxyIP = `${selectedProxy.proxyIP}:${selectedProxy.proxyPort}`;
+          proxyIP = `${selectedProxy.proxyIP}/${selectedProxy.proxyPort}`;
           return await websockerHandler(request);
         }
 
         const ipPortMatch = cleanPath.match(/^([\d.]+):(\d+)$/);
         if (ipPortMatch) {
-          proxyIP = `${ipPortMatch[1]}:${ipPortMatch[2]}`;
+          proxyIP = `${ipPortMatch[1]}/${ipPortMatch[2]}`;
           return await websockerHandler(request);
         }
 
