@@ -1,0 +1,66 @@
+name: Update Domains and Routes in wrangler.toml
+
+on:
+  push:
+    paths:
+      - domains.json  # This is the file that will trigger the action
+
+jobs:
+  update-domains:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'  # Adjust the Node.js version as needed
+
+      - name: Install Dependencies
+        run: |
+          npm install  # This will install any dependencies if necessary
+
+      - name: Update wrangler.toml with new domains
+        run: |
+          # Parse domains from the JSON file
+          DOMAIN_JSON_FILE="domains.json"
+          WRANGLER_FILE="wrangler.toml"
+          
+          # Read the domains from the JSON file
+          DOMAINS=$(jq -r '.domains' $DOMAIN_JSON_FILE)
+
+          # Start with the wrangler.toml file content and replace the existing domains and routes
+          TOML_CONTENT=$(cat $WRANGLER_FILE)
+
+          # Loop through domains and create the routes for them
+          for domain in $(echo "$DOMAINS" | jq -r '.[]'); do
+            ROUTES=$(echo "$TOML_CONTENT" | grep -oP "(?<=\{ pattern = \").*${domain}(?=\")")
+
+            # Create the routes if they do not exist
+            if [ -z "$ROUTES" ]; then
+              # Add routes for the domain
+              NEW_ROUTES=$(cat <<EOF
+{ pattern = "${domain}", custom_domain = true },
+{ pattern = "ava.game.naver.com.${domain}", custom_domain = true },
+{ pattern = "df.game.naver.com.${domain}", custom_domain = true },
+{ pattern = "graph.instagram.com.${domain}", custom_domain = true },
+{ pattern = "zaintest.vuclip.com.${domain}", custom_domain = true },
+{ pattern = "support.zoom.us.${domain}", custom_domain = true },
+{ pattern = "cache.netflix.com.${domain}", custom_domain = true },
+EOF
+              )
+
+              # Append the new routes to the wrangler.toml file
+              echo "$NEW_ROUTES" >> $WRANGLER_FILE
+            fi
+          done
+
+      - name: Commit updated wrangler.toml
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+          git add wrangler.toml
+          git commit -m "Update wrangler.toml with new domains and routes"
+          git push
