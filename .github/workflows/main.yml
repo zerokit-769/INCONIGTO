@@ -3,7 +3,7 @@ name: Update Domains and Routes in wrangler.toml
 on:
   push:
     paths:
-      - domains.json  # This is the file that will trigger the action
+      - domains.json  # This will trigger the action when domains.json changes
 
 jobs:
   update-domains:
@@ -16,44 +16,38 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'  # Adjust the Node.js version as needed
+          node-version: '16'  # Specify the Node.js version
 
       - name: Install Dependencies
         run: |
-          npm install  # This will install any dependencies if necessary
+          npm install  # This will install dependencies if there are any
 
       - name: Update wrangler.toml with new domains
         run: |
-          # Parse domains from the JSON file
           DOMAIN_JSON_FILE="domains.json"
           WRANGLER_FILE="wrangler.toml"
-          
+
           # Read the domains from the JSON file
           DOMAINS=$(jq -r '.domains' $DOMAIN_JSON_FILE)
 
-          # Start with the wrangler.toml file content and replace the existing domains and routes
-          TOML_CONTENT=$(cat $WRANGLER_FILE)
-
           # Loop through domains and create the routes for them
           for domain in $(echo "$DOMAINS" | jq -r '.[]'); do
-            ROUTES=$(echo "$TOML_CONTENT" | grep -oP "(?<=\{ pattern = \").*${domain}(?=\")")
+            # Check if routes already exist
+            ROUTES=$(grep -oP "(?<=\{ pattern = \").*${domain}(?=\")" $WRANGLER_FILE)
 
-            # Create the routes if they do not exist
+            # If routes don't exist, add them
             if [ -z "$ROUTES" ]; then
               # Add routes for the domain
-              NEW_ROUTES=$(cat <<EOF
-{ pattern = "${domain}", custom_domain = true },
-{ pattern = "ava.game.naver.com.${domain}", custom_domain = true },
-{ pattern = "df.game.naver.com.${domain}", custom_domain = true },
-{ pattern = "graph.instagram.com.${domain}", custom_domain = true },
-{ pattern = "zaintest.vuclip.com.${domain}", custom_domain = true },
-{ pattern = "support.zoom.us.${domain}", custom_domain = true },
-{ pattern = "cache.netflix.com.${domain}", custom_domain = true },
-EOF
-              )
+              NEW_ROUTES="{ pattern = \"${domain}\", custom_domain = true },"
+              NEW_ROUTES+="\n{ pattern = \"ava.game.naver.com.${domain}\", custom_domain = true },"
+              NEW_ROUTES+="\n{ pattern = \"df.game.naver.com.${domain}\", custom_domain = true },"
+              NEW_ROUTES+="\n{ pattern = \"graph.instagram.com.${domain}\", custom_domain = true },"
+              NEW_ROUTES+="\n{ pattern = \"zaintest.vuclip.com.${domain}\", custom_domain = true },"
+              NEW_ROUTES+="\n{ pattern = \"support.zoom.us.${domain}\", custom_domain = true },"
+              NEW_ROUTES+="\n{ pattern = \"cache.netflix.com.${domain}\", custom_domain = true }"
 
-              # Append the new routes to the wrangler.toml file
-              echo "$NEW_ROUTES" >> $WRANGLER_FILE
+              # Append the new routes to wrangler.toml
+              echo -e "$NEW_ROUTES" >> $WRANGLER_FILE
             fi
           done
 
