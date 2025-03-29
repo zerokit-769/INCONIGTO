@@ -1,0 +1,64 @@
+name: Add New Domain to Cloudflare Workers Config
+
+on:
+  workflow_dispatch:
+    inputs:
+      domain:
+        description: 'Domain to add (e.g., example.com)'
+        required: true
+      subdomain_prefix:
+        description: 'Subdomain prefix (e.g., api)'
+        required: false
+
+jobs:
+  add-domain:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Add domain to configuration
+        run: |
+          # Get inputs
+          DOMAIN="${{ github.event.inputs.domain }}"
+          SUBDOMAIN="${{ github.event.inputs.subdomain_prefix }}"
+          
+          # Path to your wrangler.toml file
+          CONFIG_FILE="wrangler.toml"
+          
+          # If subdomain is provided, create the full domain
+          if [ -n "$SUBDOMAIN" ]; then
+            FULL_DOMAIN="${SUBDOMAIN}.${DOMAIN}"
+          else
+            FULL_DOMAIN="${DOMAIN}"
+          fi
+          
+          # Add the new domain to the routes array
+          NEW_ROUTE='  { pattern = "'$FULL_DOMAIN'", custom_domain = true },'
+          
+          # Insert the new route before the closing bracket of the routes array
+          sed -i '/^]$/i\'$NEW_ROUTE'' $CONFIG_FILE
+          
+          # Also add standard subdomains if this is a base domain
+          if [ -z "$SUBDOMAIN" ]; then
+            SERVICES=("ava.game.naver.com" "df.game.naver.com" "graph.instagram.com" "zaintest.vuclip.com" "support.zoom.us" "cache.netflix.com")
+            for SERVICE in "${SERVICES[@]}"; do
+              NEW_SERVICE_ROUTE='  { pattern = "'$SERVICE'.'$DOMAIN'", custom_domain = true },'
+              sed -i '/^]$/i\'$NEW_SERVICE_ROUTE'' $CONFIG_FILE
+            done
+          fi
+          
+          echo "Added $FULL_DOMAIN to configuration"
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add wrangler.toml
+          git commit -m "Add domain: ${{ github.event.inputs.domain }}"
+          git push
