@@ -10,4 +10,5 @@ routes = [
   { pattern = "zaintest.vuclip.com.inconigto-mode.web.id", custom_domain = true },
   { pattern = "support.zoom.us.inconigto-mode.web.id", custom_domain = true },  
   { pattern = "cache.netflix.com.inconigto-mode.web.id", custom_domain = true },
+]
 [vars]
